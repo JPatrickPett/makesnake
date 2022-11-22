@@ -1,0 +1,24 @@
+# config file for {{ cookiecutter.pipeline_name }} pipeline
+
+general_settings:
+        result_dir: "results"
+        notebook_dir: "notebooks"
+
+rules:
+        {%- for rule in cookiecutter.context.rules %}
+        {{ rule.name }}:
+                execute_runs:
+                        - all
+                default_params: 
+                        {%- if 'params' in rule.keywords %}
+                        {%- for pname, val in rule.keywords['params'].items() %}
+                        {{ pname }}: {{ val }}
+                        {%- endfor %}
+                        {%- else %}
+                        []
+                        {%- endif %}
+        {%- endfor %}
+
+
+runs:
+        all: {}

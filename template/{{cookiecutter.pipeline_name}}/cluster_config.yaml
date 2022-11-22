@@ -1,0 +1,7 @@
+__default__:
+        q: normal
+        e: "cluster_log/{rule}.{jobid}.err"
+        o: "cluster_log/{rule}.{jobid}.out"
+        n: 4
+        M: 10000
+

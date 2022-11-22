@@ -1,0 +1,100 @@
+## {{cookiecutter.pipeline_name}} pipeline
+## version: 0.5
+## created using makesnake
+
+import os, sys, yaml, re, textwrap, hashlib, pandas as pd
+from collections import OrderedDict
+from time import asctime, localtime, time
+from pathlib import Path
+from snakemake.utils import report, format as snakemake_format
+from snakemake.logging import logger
+
+
+yaml.add_representer(OrderedDict, lambda dumper, data: dumper.represent_dict(dict(data)))
+
+configfile: "config.yaml"
+
+# source files
+SNAKEDIR  = Path(workflow.current_basedir)
+SNAKEFILE = workflow.snakefile
+SCRIPTDIR = str(SNAKEDIR / "scripts")
+RESULTDIR = Path(config["general_settings"]["result_dir"])
+NOTEBOOKDIR = Path(config["general_settings"]["notebook_dir"])
+
+
+#######################################################################
+#                    apply defaults to config runs                    #
+#######################################################################
+
+for runID in config["runs"]:
+	for ruleID in config["rules"]:
+		if ruleID in config["runs"][runID]:
+			config["runs"][runID][ruleID] = {
+				**config["rules"][ruleID]["default_params"],
+				**config["runs"][runID][ruleID] 
+			}
+		else:
+			config["runs"][runID][ruleID] = config["rules"][ruleID]["default_params"]
+
+
+#######################################################################
+#                           starting point                            #
+#######################################################################
+
+
+def get_all_input():
+	inputs = []
+
+	{% for rule in cookiecutter.context.rules -%}
+	# {{ rule.name }}
+	for run_id in config["rules"]["{{ rule.name }}"]["execute_runs"]:
+		{%- for fname in rule.keywords["output"].values() %}
+		inputs.append({{ fname }}.format(runID = run_id))
+		{%- endfor %}
+	{% endfor %}
+
+	return inputs
+
+
+rule all:
+	input: get_all_input()
+
+
+#######################################################################
+#                          rule definitions                           #
+#######################################################################
+
+
+{% for rule in cookiecutter.context.rules %}
+rule {{ rule.name }}:
+	{%- for kw in ['input', 'output', 'log'] %}
+	{%- if kw in rule.keywords %}
+	{{ kw }}:
+		{%- for pname, fname in rule.keywords[kw].items() %}
+		{{ pname }} = {{ fname }}{{ ", " if not loop.last else "" }}
+		{%- endfor %}
+	{%- endif %}
+	{%- endfor %}
+	{%- for kw in ['params'] %}
+	{%- if kw in rule.keywords %}
+	{{ kw }}:
+		{%- for pname, fname in rule.keywords[kw].items() %}
+		{{ pname }} = lambda wc: config["runs"][wc.runID]["{{ rule.name }}"]["{{ pname }}"]{{ ", " if not loop.last else "" }}
+		{%- endfor %}
+	{%- endif %}
+	{%- endfor %}
+	{%- for kw in ['threads'] %}
+	{%- if kw in rule.keywords %}
+	{{ kw }}:
+		{{ rule.keywords[kw] }}
+	{%- endif %}
+	{%- endfor %}
+	{%- for kw in ['conda', 'notebook', 'script'] %}
+	{%- if kw in rule.keywords %}
+	{{ kw }}:
+		"{{ rule.keywords[kw] }}"
+	{%- endif %}
+	{%- endfor %}
+{% endfor %}
+
+
