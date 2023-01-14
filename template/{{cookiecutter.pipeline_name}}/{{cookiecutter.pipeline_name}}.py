@@ -3,10 +3,14 @@
 ## command line interface to run {{ cookiecutter.pipeline_name }} pipeline and helper functions
 
 
-import os, sys, time, shutil, argparse, json, yaml, re, textwrap
-import pandas as pd
-from pathlib import Path
+import os
+import sys
+import time
+import shutil
+import argparse
+import textwrap
 
+from pathlib import Path
 import logzero
 from logzero import logger as log
 logzero.loglevel(logzero.INFO)
@@ -96,6 +100,8 @@ def run_pipeline(args):
         if args.snake_options:
             command += " " + " ".join(args.snake_options)
         command = "set -e; " + command
+
+        Path("cluster_log").mkdir(exist_ok=True)
 
     # run
     log.info(command)

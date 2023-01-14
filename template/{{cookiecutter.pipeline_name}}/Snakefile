@@ -71,7 +71,9 @@ rule {{ rule.name }}:
 	{%- if kw in rule.keywords %}
 	{{ kw }}:
 		{%- for pname, fname in rule.keywords[kw].items() %}
-		{{ pname }} = {{ fname }}{{ ", " if not loop.last else "" }}
+		{%- set ext = fname.split('.') | last | trim('"') %}
+		{%- set pstr = "touch("+fname+")" if kw == "output" and ext == "done" else fname %}
+		{{ pname }} = {{ pstr }}{{ ", " if not loop.last else "" }}
 		{%- endfor %}
 	{%- endif %}
 	{%- endfor %}

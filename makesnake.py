@@ -17,7 +17,7 @@ from cookiecutter.main import cookiecutter
 
 SCRIPT_DIR = Path(sys.path[0])
 
-file_path_pattern = "(?P<path>.*?)(?P<filename>[^/.]+)\.(?P<extension>.+)$"
+file_path_pattern = "(?P<path>.*?)(?P<filename>[^/.]+)(?P<extension>[^/]*)$"
 keyword_comment_pattern = "[^#]*# *(?P<keyword>input|output|params|log|threads) +(?P<name>\S+): +<(?P<value>[^<>]+)>"
 
 ############################## RUN
@@ -39,7 +39,7 @@ def make_pipeline(args):
     # 3) parse list of scripts
     context["context"] = {"rules": []}
     log.info(f"parsing info from script files, context so far: {context}")
-    for f in args.scripts:
+    for f in args.script:
         m_file = re.match(file_path_pattern, f.name)
 
         script_rule = {
@@ -55,7 +55,7 @@ def make_pipeline(args):
                 kw, name, val = m.group("keyword"), m.group("name"), m.group("value")
                 if kw in ["output", "input", "log"]:
                     m = re.match(file_path_pattern, val.strip('\'"'))
-                    val = f"\"{m.group('path')}{m.group('filename')}_{{runID}}.{m.group('extension')}\""
+                    val = f"RESULTDIR / \"{m.group('path')}{m.group('filename')}_{{runID}}{m.group('extension')}\""
 
                 if kw in ["threads"]:
                     script_rule["keywords"][kw] = val
@@ -69,14 +69,14 @@ def make_pipeline(args):
 
         extension = m_file.group("extension")
         run_method = {
-            "py": dict(kw="script", val="{{SCRIPTDIR}}/{script_path}"),
-            "R": dict(kw="script", val="{{SCRIPTDIR}}/{script_path}"),
-            "ipynb": dict(kw="notebook", val="{{SCRIPTDIR}}/{script_path}"),
-            "sh": dict(kw="shell", val="bash {{SCRIPTDIR}}/{script_path}"),
+            ".py": dict(kw="script", val="{{SCRIPTDIR}}/{script_path}"),
+            ".R": dict(kw="script", val="{{SCRIPTDIR}}/{script_path}"),
+            ".ipynb": dict(kw="notebook", val="{{SCRIPTDIR}}/{script_path}"),
+            ".sh": dict(kw="shell", val="bash {{SCRIPTDIR}}/{script_path}"),
         }
         script_rule["keywords"][run_method[extension]["kw"]] = run_method[extension]["val"].format(script_path = f.name)
 
-        if extension == "ipynb":
+        if extension == ".ipynb":
             notebook_path = f"NOTEBOOKDIR / \"notebook_{script_rule['name']}_{{runID}}.ipynb\""
             if "log" not in script_rule["keywords"]:
                 script_rule["keywords"]["log"] = {"notebook": notebook_path}
@@ -124,7 +124,7 @@ def make_pipeline(args):
 
     # move script file into new folder
     log.info("move script files into new folder")
-    for f in args.scripts:
+    for f in args.script:
         shutil.copy(
             f.name,
             f"{context['pipeline_name']}/scripts/"
@@ -137,7 +137,7 @@ def make_pipeline(args):
 
 parser = argparse.ArgumentParser(description="run makesnake: create snakemake pipeline from list of scripts")
 
-parser.add_argument('scripts', action = "extend", nargs = "+", type = argparse.FileType('r'), help = "list of scripts")
+parser.add_argument('script', action = "extend", nargs = "+", type = argparse.FileType('r'), help = "list of scripts")
 parser.set_defaults(func=make_pipeline)
 
 

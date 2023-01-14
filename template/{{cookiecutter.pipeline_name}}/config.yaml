@@ -1,8 +1,8 @@
 # config file for {{ cookiecutter.pipeline_name }} pipeline
 
 general_settings:
-        result_dir: "results"
-        notebook_dir: "notebooks"
+        result_dir: "results/"
+        notebook_dir: "notebooks/"
 
 rules:
         {%- for rule in cookiecutter.context.rules %}
