@@ -74,7 +74,7 @@ def make_pipeline(args):
             ".ipynb": dict(kw="notebook", val="{{SCRIPTDIR}}/{script_path}"),
             ".sh": dict(kw="shell", val="bash {{SCRIPTDIR}}/{script_path}"),
         }
-        script_rule["keywords"][run_method[extension]["kw"]] = run_method[extension]["val"].format(script_path = f.name)
+        script_rule["keywords"][run_method[extension]["kw"]] = run_method[extension]["val"].format(script_path = str(Path(f.name).name))
 
         if extension == ".ipynb":
             notebook_path = f"NOTEBOOKDIR / \"notebook_{script_rule['name']}_{{runID}}.ipynb\""
