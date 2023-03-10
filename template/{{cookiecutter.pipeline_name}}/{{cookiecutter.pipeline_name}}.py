@@ -35,20 +35,23 @@ def setup_working_directory(args):
     # create working directory
     working_dir = Path(time.strftime(args.dirname))
     try:
-        (working_dir / "dataset_configs").mkdir(parents=True)
+        working_dir.mkdir(parents=True)
         log.info("working directory {} created...".format(str(working_dir)))
     except FileExistsError:
         log.warning("directory {} already exists!".format(str(working_dir)))
         if input("overwrite? [yes/NO] ") == "yes":
             log.warning("directory exists: overwriting!")
             shutil.rmtree(str(working_dir))
-            (working_dir / "dataset_configs").mkdir(parents=True)
+            working_dir.mkdir(parents=True)
         else:
             log.error("directory exists: quitting!")
             return 1
 
+    # copy config file
+    shutil.copy(SCRIPT_DIR / "config.yaml", working_dir / "config.yaml")
+
     # symlink to wrapper or add alias to bashrc
-    (working_dir / "cellregulon").symlink_to(SCRIPT_DIR / "cellregulon.py")
+    (working_dir / "{{ cookiecutter.pipeline_name }}").symlink_to(SCRIPT_DIR / "{{ cookiecutter.pipeline_name }}.py")
 
     log.info("all done.")
 

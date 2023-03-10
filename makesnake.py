@@ -72,7 +72,7 @@ def make_pipeline(args):
             ".py": dict(kw="script", val="{{SCRIPTDIR}}/{script_path}"),
             ".R": dict(kw="script", val="{{SCRIPTDIR}}/{script_path}"),
             ".ipynb": dict(kw="notebook", val="{{SCRIPTDIR}}/{script_path}"),
-            ".sh": dict(kw="shell", val="bash {{SCRIPTDIR}}/{script_path}"),
+            ".sh": dict(kw="shell", val="{{SCRIPTDIR}}/{script_path} {{input:q}} {{output:q}} {{params:q}}"),
         }
         script_rule["keywords"][run_method[extension]["kw"]] = run_method[extension]["val"].format(script_path = str(Path(f.name).name))
 
