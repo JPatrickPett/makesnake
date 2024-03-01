@@ -4,7 +4,7 @@
 
 __version__ = "0.6"
 
-import os, sys, time, shutil, argparse, json, yaml, re, textwrap
+import os, sys, time, shutil, argparse, json, yaml, re, textwrap, codecs
 import tempfile
 import pandas as pd
 from pathlib import Path
@@ -53,6 +53,7 @@ def make_pipeline(args):
             m = re.match(keyword_comment_pattern, line)
             if m:
                 kw, name, val = m.group("keyword"), m.group("name"), m.group("value")
+                val = codecs.decode(val, 'unicode_escape')
                 if kw in ["output", "input", "log"]:
                     m = re.match(file_path_pattern, val.strip('\'"'))
                     val = f"RESULTDIR / \"{m.group('path')}{m.group('filename')}_{{runID}}{m.group('extension')}\""
