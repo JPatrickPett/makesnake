@@ -54,7 +54,10 @@ def make_pipeline(args):
             if m:
                 kw, name, val = m.group("keyword"), m.group("name"), m.group("value")
                 val = codecs.decode(val, 'unicode_escape')
-                if kw in ["output", "input", "log"]:
+                if kw in ["input"]:
+                    m = re.match(file_path_pattern, val.strip('\'"'))
+                    val = f"\"{m.group('path')}{m.group('filename')}_{{runID}}{m.group('extension')}\""
+                elif kw in ["output", "log"]:
                     m = re.match(file_path_pattern, val.strip('\'"'))
                     val = f"RESULTDIR / \"{m.group('path')}{m.group('filename')}_{{runID}}{m.group('extension')}\""
 

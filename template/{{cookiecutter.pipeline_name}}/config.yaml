@@ -10,13 +10,12 @@ rules:
                 execute_runs:
                         - all
                 default_params: 
-                        {%- if 'params' in rule.keywords %}
+                        {%- for pname, fname in rule.keywords['input'].items() %}
+                        {{ pname }}: {{ fname }}
+                        {%- endfor %}
                         {%- for pname, val in rule.keywords['params'].items() %}
                         {{ pname }}: {{ val }}
                         {%- endfor %}
-                        {%- else %}
-                        []
-                        {%- endif %}
         {%- endfor %}
 
 

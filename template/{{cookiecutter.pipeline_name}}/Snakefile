@@ -67,7 +67,15 @@ rule all:
 
 {% for rule in cookiecutter.context.rules %}
 rule {{ rule.name }}:
-	{%- for kw in ['input', 'output', 'log'] %}
+	{%- for kw in ['input'] %}
+	{%- if kw in rule.keywords %}
+	{{ kw }}:
+		{%- for pname, fname in rule.keywords[kw].items() %}
+		{{ pname }} = lambda wc: RESULTDIR / config["runs"][wc.runID]["{{ rule.name }}"]["{{ pname }}"]{{ ", " if not loop.last else "" }}
+		{%- endfor %}
+	{%- endif %}
+	{%- endfor %}
+	{%- for kw in ['output', 'log'] %}
 	{%- if kw in rule.keywords %}
 	{{ kw }}:
 		{%- for pname, fname in rule.keywords[kw].items() %}
