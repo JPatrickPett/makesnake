@@ -2,7 +2,7 @@
 
 ## run makesnake
 
-__version__ = "0.6"
+__version__ = "0.7"
 
 import os, sys, time, shutil, argparse, json, yaml, re, textwrap, codecs
 import tempfile
