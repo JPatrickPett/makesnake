@@ -36,6 +36,9 @@ for runID in config["runs"]:
 		else:
 			config["runs"][runID][ruleID] = config["rules"][ruleID]["default_params"]
 
+# save merged config file for debugging
+with open("config_tmp.yaml", "w") as f:
+	yaml.dump(config, f)
 
 #######################################################################
 #                           starting point                            #
