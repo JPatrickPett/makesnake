@@ -3,12 +3,13 @@
 general_settings:
         result_dir: "results/"
         notebook_dir: "notebooks/"
+        execute_runs: &exec_runs
+                - all
 
 rules:
         {%- for rule in cookiecutter.context.rules %}
         {{ rule.name }}:
-                execute_runs:
-                        - all
+                execute_runs: *exec_runs
                 default_params: 
                         {%- for pname, fname in rule.keywords['input'].items() %}
                         {{ pname }}: {{ fname }}

@@ -89,6 +89,21 @@ def make_pipeline(args):
 
         log.info(f"context for script: {script_rule}")
         context["context"]["rules"].append(script_rule)
+
+    # fix rule names (snakemake does not allow leading digits)
+    try:
+        # try stripping leading digits
+        strip_regex = "^[0-9_]+"
+        rule_names = [re.sub(strip_regex, "", rule["name"]) for rule in context["context"]["rules"]]
+        assert len(rule_names)==len(set(rule_names)), "rule names have to remain unique"
+        for rule in context["context"]["rules"]:
+            rule["name"] = re.sub(strip_regex, "", rule["name"])
+    except AssertionError:
+        # add leading 'num' to rules starting with a digit
+        for rule in context["context"]["rules"]:
+            if re.match(rule["name"], "[0-9].*"):
+                rule["name"] = "num" + rule["name"]
+
     log.info(f"context: {context}")
 
     # 4) create environment and post_deploy scripts (skip for now)
