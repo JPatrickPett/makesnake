@@ -1,8 +1,8 @@
 # config file for {{ cookiecutter.pipeline_name }} pipeline
 
 general_settings:
-        result_dir: "results/"
-        notebook_dir: "notebooks/"
+        result_dir: "results_{runID}/"
+        notebook_dir: "notebooks_{runID}/"
         execute_runs: &exec_runs
                 - all
 
@@ -11,12 +11,16 @@ rules:
         {{ rule.name }}:
                 execute_runs: *exec_runs
                 default_params: 
+                        {%- if 'input' in rule.keywords %}
                         {%- for pname, fname in rule.keywords['input'].items() %}
-                        {{ pname }}: {{ fname }}
+                        input_{{ pname }}: "{{ 'results_{runID}/' if not fname.lstrip('"')|first == '/' }}{{ fname.lstrip('"').rstrip('"') }}"
                         {%- endfor %}
+                        {%- endif %}
+                        {%- if 'params' in rule.keywords %}
                         {%- for pname, val in rule.keywords['params'].items() %}
                         {{ pname }}: {{ val }}
                         {%- endfor %}
+                        {%- endif %}
         {%- endfor %}
 
 

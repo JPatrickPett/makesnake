@@ -74,7 +74,7 @@ rule {{ rule.name }}:
 	{%- if kw in rule.keywords %}
 	{{ kw }}:
 		{%- for pname, fname in rule.keywords[kw].items() %}
-		{{ pname }} = lambda wc: RESULTDIR / config["runs"][wc.runID]["{{ rule.name }}"]["{{ pname }}"]{{ ", " if not loop.last else "" }}
+		{{ pname }} = lambda wc: config["runs"][wc.runID]["{{ rule.name }}"]["input_{{ pname }}"]{{ ", " if not loop.last else "" }}
 		{%- endfor %}
 	{%- endif %}
 	{%- endfor %}
@@ -89,12 +89,11 @@ rule {{ rule.name }}:
 	{%- endif %}
 	{%- endfor %}
 	{%- for kw in ['params'] %}
-	{%- if kw in rule.keywords %}
 	{{ kw }}:
+		result_dir = lambda wc: RESULTDIR.format(runID = wc.runID){{ ", " if kw in rule.keywords }}
 		{%- for pname, fname in rule.keywords[kw].items() %}
 		{{ pname }} = lambda wc: config["runs"][wc.runID]["{{ rule.name }}"]["{{ pname }}"]{{ ", " if not loop.last else "" }}
 		{%- endfor %}
-	{%- endif %}
 	{%- endfor %}
 	{%- for kw in ['threads'] %}
 	{%- if kw in rule.keywords %}
