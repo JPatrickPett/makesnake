@@ -8,7 +8,7 @@ Usage:
 makesnake.py script1.py script2.R script3.sh notebook4.ipynb
 ```
 
-This creates a new folder with a snakemake pipeline, including `Snakefile`, scripts copied into a `scripts/` folder, `config.yaml` file with the parameter values, `cluster_config.yaml` to define default resources, an empty `envs/` folder to be filled with environment specifications and a command line interface to run the pipeline.
+This creates a new folder in the working directory with a snakemake pipeline, including `Snakefile`, scripts copied into a `scripts/` folder, `config.yaml` file with the parameter values, `cluster_config.yaml` to define default resources, an empty `envs/` folder to be filled with environment specifications and a command line interface to run the pipeline.
 
 Supported scripts are:
 - python (.py)
@@ -51,4 +51,36 @@ out_path = str(snakemake.output.out_path)
 number = float(snakemake.params.number)
 string = str(snakemake.params.string)
 a_list = list(snakemake.params.a_list)
+```
+
+## config file
+
+The config file allows flexible adjustment of multiple pipeline runs with different parameters (even rewiring the order of steps without changes to the Snakefile).
+Default parameters are added unter defaults. In addition, a list of `runs` is specified at the bottom of the file, which can be used to overwrite specific parameters per run, and add additional runs.
+(TODO: add more explanation)
+
+Example:
+
+```yaml
+general_settings:
+    result_dir: "results/"
+    notebook_dir: "notebooks/"
+    execute_runs: &exec_runs
+        - all
+        - new_run
+
+rules:
+    Step1:
+        execute_runs: *exec_runs
+        default_params:
+            input_in_path: /path/to/infile.txt
+            number: 123
+            string: text
+            a_list: ["a", "b", "c"]
+
+runs:
+    all: {}
+    new_run:
+        Step1:
+            number: 321
 ```
