@@ -20,9 +20,9 @@ from cookiecutter.main import cookiecutter
 
 SCRIPT_DIR = Path(sys.path[0])
 
-CLUSTER_LOCAL = """snakemake --snakefile {sdir}/Snakefile --cores 1 --use-conda --conda-prefix /nfs/team205/jp30/conda_envs/snakemake --skip-script-cleanup""".format(sdir = str(SCRIPT_DIR))
+CLUSTER_LOCAL = """snakemake --snakefile {sdir}/Snakefile --cores 1 --use-conda --skip-script-cleanup""".format(sdir = str(SCRIPT_DIR))
 
-CLUSTER_GLOBAL = """snakemake --snakefile {sdir}/Snakefile  --use-conda --conda-prefix /nfs/team205/jp30/conda_envs/snakemake --cluster '{sdir}/lsf_submit.sh -q {{ '{{' }}cluster.q{{ '}}' }} -e {{ '{{' }}cluster.e{{ '}}' }} -o {{ '{{' }}cluster.o{{ '}}' }} -n {{ '{{' }}cluster.n{{ '}}' }} -M {{ '{{' }}cluster.M{{ '}}' }} -R"select[mem>{{ '{{' }}cluster.M{{ '}}' }}] rusage[mem={{ '{{' }}cluster.M{{ '}}' }}] span[hosts=1]"' --cluster-cancel '{sdir}/lsf_cancel.sh' --cluster-status '{sdir}/lsf_status.sh' --cluster-config cluster_config.yaml --jobs 100 --latency-wait 180 --restart-times 3 --skip-script-cleanup""".format(
+CLUSTER_GLOBAL = """snakemake --snakefile {sdir}/Snakefile  --use-conda --cluster '{sdir}/lsf_submit.sh -q {{ '{{' }}cluster.q{{ '}}' }} -e {{ '{{' }}cluster.e{{ '}}' }} -o {{ '{{' }}cluster.o{{ '}}' }} -n {{ '{{' }}cluster.n{{ '}}' }} -M {{ '{{' }}cluster.M{{ '}}' }} -R"select[mem>{{ '{{' }}cluster.M{{ '}}' }}] rusage[mem={{ '{{' }}cluster.M{{ '}}' }}] span[hosts=1]"' --cluster-cancel '{sdir}/lsf_cancel.sh' --cluster-status '{sdir}/lsf_status.sh' --cluster-config cluster_config.yaml --jobs 100 --latency-wait 180 --restart-times 3 --skip-script-cleanup""".format(
     sdir = str(SCRIPT_DIR)
 )
 
