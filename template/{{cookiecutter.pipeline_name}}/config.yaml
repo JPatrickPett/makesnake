@@ -9,7 +9,7 @@ general_settings:
 rules:
         {%- for rule in cookiecutter.context.rules %}
         {{ rule.name }}:
-                execute_runs: *exec_runs
+                execute_in_runs: *exec_runs
                 default_params: 
                         {%- if 'input' in rule.keywords %}
                         {%- for pname, fname in rule.keywords['input'].items() %}
